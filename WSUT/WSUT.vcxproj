@@ -139,7 +139,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ProcessManagement.cpp" />
     <ClCompile Include="WSUT.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ProcessManagement.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
