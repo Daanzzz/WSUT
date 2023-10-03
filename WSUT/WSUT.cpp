@@ -9,6 +9,7 @@
 
 // program commands
 #define PROCESS_MANAGEMENT_COMMAND "pm"
+#define TERMINATE_PROCESS "tp"
 #define HELP_COMMAND "help"
 #define EXIT_COMMAND "exit"
 
@@ -21,13 +22,13 @@ std::string getInput() {
 }
 
 void guide() {
-    std::cout << "\nGuide:\npm - process management\nhelp - shows the guide\nexit - exits the program\n\n*Note* - in order to go back to the menu hold x\n\n";
+    std::cout << "\nGuide:\npm - process management\ntp - terminate a process\nhelp - shows the guide\nexit - exits the program\n\n*Note* - in order to go back to the menu hold x\n\n";
 }
 
 int main(void) {
     std::cout << ASCII_ART;
-    guide();
 
+    guide();
     std::string choice = "";
 
     while (choice != EXIT_COMMAND) {
@@ -42,6 +43,18 @@ int main(void) {
         }
         else if (choice == EXIT_COMMAND) {
             std::cout << "Goodbye.\n";
+        }
+        else if (choice == TERMINATE_PROCESS) {
+            std::cout << "enter process ID: ";
+            int pID = 0;
+            std::cin >> pID;
+
+            if (!ProcessManagement::EndProcess(pID)) {
+                std::cout << "Error: didn't terminate process!\n";
+            }
+            else {
+                std::cout << "Process terminated\n";
+            }
         }
         else {
             std::cout << "Unkown command.\n";

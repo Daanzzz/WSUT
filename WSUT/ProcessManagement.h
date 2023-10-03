@@ -13,7 +13,7 @@ public:
     // * processID - The ID of the process to add
     // * procs - A map to store process IDs and their corresponding names
     // * pIDs - A vector to store process IDs
-	static void addProc(DWORD processID, std::map<int, std::string>& procs, std::vector<int>& pIDs);
+    static void addProc(DWORD processID, std::map<int, std::string>& procs, std::vector<int>& pIDs);
 
     // Retrieves a list of running process IDs and their names
     // Parameters:
@@ -21,9 +21,11 @@ public:
     // * procs - A map to store process IDs and their corresponding names
     // Returns
     // * Returns TRUE if the process enumeration is successful, FALSE otherwise
-	static BOOL getProcs(std::vector<int>& pIDs, std::map<int, std::string>& procs);
+    static BOOL getProcs(std::vector<int>& pIDs, std::map<int, std::string>& procs);
     
     // Constantly updates the process update (when needed)
     // * Returns 0 any time
     static int ProcUpdater();
+
+    static int EndProcess(int pID);
 };
