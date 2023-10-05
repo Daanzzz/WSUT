@@ -8,10 +8,6 @@
 
 class ProcessManagement {
 public:
-    // Gets user input
-    // * Returns user input
-    static std::string GetInput();
-
     // Adds a process to the provided maps and vector
     // Parameters:
     // * processID - The ID of the process to add

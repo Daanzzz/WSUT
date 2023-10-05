@@ -7,14 +7,6 @@
 #define MAX_PROCESSES 1024
 #define MAX_PROCS_PER_PAGE 26
 
-std::string ProcessManagement::GetInput(){
-    std::string input = "";
-    std::cout << "> ";
-    std::cin >> input;
-
-    return input;
-}
-
 void ProcessManagement::AddProc(DWORD processID, std::vector<std::pair<int, std::string>>& procs) {
     TCHAR szProcessName[MAX_PATH] = TEXT("<unknown>");
 
