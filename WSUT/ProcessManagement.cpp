@@ -5,8 +5,17 @@
 #include <iostream>
 
 #define MAX_PROCESSES 1024
+#define MAX_PROCS_PER_PAGE 26
 
-void ProcessManagement::addProc(DWORD processID, std::map<int, std::string>& procs, std::vector<int>& pIDs) {
+std::string ProcessManagement::GetInput(){
+    std::string input = "";
+    std::cout << "> ";
+    std::cin >> input;
+
+    return input;
+}
+
+void ProcessManagement::AddProc(DWORD processID, std::vector<std::pair<int, std::string>>& procs) {
     TCHAR szProcessName[MAX_PATH] = TEXT("<unknown>");
 
     // get a handle to the process
@@ -29,8 +38,9 @@ void ProcessManagement::addProc(DWORD processID, std::map<int, std::string>& pro
                 // didn't fail to get proccess name 
                 std::wstring pnT(&szProcessName[0]); //convert to wstring
                 std::string pn(pnT.begin(), pnT.end()); //and convert to string
-                pIDs.push_back(processID);
-                procs[processID] = pn;
+
+                std::pair<int, std::string> temp = std::make_pair(processID, pn);
+                procs.push_back(temp);
             }
         }
     }
@@ -40,7 +50,7 @@ void ProcessManagement::addProc(DWORD processID, std::map<int, std::string>& pro
 
 }
 
-BOOL ProcessManagement::getProcs(std::vector<int>& pIDs, std::map<int, std::string>& procs) {
+BOOL ProcessManagement::GetProcs(std::vector<std::pair<int, std::string>>& procs) {
     DWORD aProcesses[MAX_PROCESSES], cbNeeded, cProcesses;
     unsigned int i;
 
@@ -57,51 +67,81 @@ BOOL ProcessManagement::getProcs(std::vector<int>& pIDs, std::map<int, std::stri
     for (i = 0; i < cProcesses; i++) {
         if (aProcesses[i] != 0) {
             // add each valid process to the map and vector
-            addProc(aProcesses[i], procs, pIDs);
+            AddProc(aProcesses[i], procs);
         }
     }
 
     return TRUE;
 }
 
-void ClearConsole() {
+// Clears the console and then prints all the information titles (PID etc...)
+void ClearConsole(int currentPage, int neededPages) {
     std::cout << "\033c"; // ANSI escape code to reset the console
+    std::cout << "\x1B[31mPID\033[0m\t"; // PID in red color
+    std::cout << "\x1B[32mPNAME\033[0m\t";
+    printf("\033[2;47;35mPage %d/%d\033[0m", currentPage + 1, neededPages + 1);
+    std::cout << "\n\x1B[31m---\033[0m\t";
+    std::cout << "\x1B[32m-----\033[0m\t\n";
+    // Clears the console and then prints all the information titles (PID etc...)
 }
 
 int ProcessManagement::ProcUpdater() {
-    std::map<int, std::string> previousProcesses;  // store the previous list of processes
+    std::vector<std::pair<int, std::string>> previousProcesses;  // store the previous list of processes
+
+    int currentPage = 0;
+    int neededPages = previousProcesses.size() / MAX_PROCS_PER_PAGE;
+
+    bool pageFlag = false;
 
     while (true) {
-        if (GetKeyState('X') & 0x8000){
+        std::vector<std::pair<int, std::string>> processes;
+        BOOL success = ProcessManagement::GetProcs(processes);
+        neededPages = processes.size() / MAX_PROCS_PER_PAGE;
+
+        if (GetAsyncKeyState(0x58) & 0x8000) {
             return 0;
         }
 
-        std::map<int, std::string> processes;
-        std::vector<int> processIDs;
-
-        BOOL success = ProcessManagement::getProcs(processIDs, processes);
+        if (GetAsyncKeyState(0x46) & 0x8000) {
+            if (currentPage < neededPages) {
+                currentPage++;
+                pageFlag = true;
+            }
+        }
+        else if (GetAsyncKeyState(0x42) & 0x8000) {
+            if (currentPage != 0) {
+                currentPage--;
+                pageFlag = true;
+            }
+        }
 
         if (success) {
             // only clear the console if there's a change in the list of processes
-            if (processes != previousProcesses) {
-                ClearConsole();
+            if (processes != previousProcesses || pageFlag) {
+                ClearConsole(currentPage, neededPages);
 
                 // update the previousProcesses with the current processes.
                 previousProcesses = processes;
 
                 // iterate through the map to display process IDs and names
-                for (const auto& entry : processes) {
-                    std::cout << "Process ID: " << entry.first << "\tProcess Name: " << entry.second << std::endl;
+                int i = currentPage * MAX_PROCS_PER_PAGE;
+                int LastIndex = i + MAX_PROCS_PER_PAGE;
+                int pSize = processes.size();
+
+                for (i; i < LastIndex && i < pSize; i++) {
+                    std::cout << processes[i].first << "\t" << processes[i].second << std::endl;
                 }
+
+                pageFlag = false;
             }
         }
         else {
             std::cout << "Failed to retrieve the list of processes\n";
         }
 
-        Sleep(1000);
+        Sleep(100);
     }
-    
+
     return 0;
 }
 

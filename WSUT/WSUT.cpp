@@ -13,14 +13,6 @@
 #define HELP_COMMAND "help"
 #define EXIT_COMMAND "exit"
 
-std::string getInput() {
-    std::string input = "";
-    std::cout << "> ";
-    std::cin >> input;
-
-    return input;
-}
-
 void guide() {
     std::cout << "\nGuide:\npm - process management\ntp - terminate a process\nhelp - shows the guide\nexit - exits the program\n\n*Note* - in order to go back to the menu hold x\n\n";
 }
@@ -32,7 +24,7 @@ int main(void) {
     std::string choice = "";
 
     while (choice != EXIT_COMMAND) {
-        choice = getInput();
+        choice = ProcessManagement::GetInput();
 
         if (choice == PROCESS_MANAGEMENT_COMMAND) {
             ProcessManagement::ProcUpdater();
